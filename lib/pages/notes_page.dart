@@ -5,6 +5,7 @@ import 'package:notes_sphere/utils/colors.dart';
 import 'package:notes_sphere/utils/constants.dart';
 import 'package:notes_sphere/utils/router.dart';
 import 'package:notes_sphere/utils/text_styles.dart';
+import 'package:notes_sphere/widgets/notes_card.dart';
 
 class NotesPage extends StatefulWidget {
   const NotesPage({super.key});
@@ -82,16 +83,56 @@ class _NotesPageState extends State<NotesPage> {
           size: 30,
         ),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(
+      body: Padding(
+        padding: const EdgeInsets.all(
           AppConstants.kDefaultPadding,
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "Notes",
               style: AppTextStyles.appTitle,
             ),
+            const SizedBox(
+              height: 30,
+            ),
+            allNotes.isEmpty
+                ? SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: const Text(
+                      "No Notes are available, please click the + button to add a new note",
+                      style: AppTextStyles.appDescriptionStyle,
+                    ),
+                  )
+                : GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: AppConstants.kDefaultPadding,
+                      mainAxisSpacing: AppConstants.kDefaultPadding,
+                      childAspectRatio: 6 / 4,
+                    ),
+                    itemCount: notesWithCategory.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          //go to the notes by category page
+                          AppRouter.router.push(
+                            "/category",
+                            extra: notesWithCategory.keys.elementAt(index),
+                          );
+                        },
+                        child: NotesCard(
+                          noteCategory: notesWithCategory.keys.elementAt(index),
+                          noOfNotes:
+                              notesWithCategory.values.elementAt(index).length,
+                        ),
+                      );
+                    },
+                  ),
           ],
         ),
       ),
